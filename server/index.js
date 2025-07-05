@@ -15,8 +15,8 @@ const URL = "127.0.0.1"; // safer
 
 app.use(bodyParser.json());
 app.use(cors());
-app.use('/auth',router)
-app.use('/product',porrouter)
+app.use("/auth", router);
+app.use("/product", porrouter);
 
 app.listen(PORT, URL, (error) => {
   if (!error) {

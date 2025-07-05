@@ -3,7 +3,7 @@ const ensureAuthori = require("../Middleware/auth");
 const porrouter = require("express").Router();
 
 porrouter.get("/", ensureAuthori, (req, res) => {
-  console.log("--user detail--",req.user)
+  console.log("--user detail--", req.user);
   res.status(200).json([
     {
       name: "mobile",
@@ -11,7 +11,7 @@ porrouter.get("/", ensureAuthori, (req, res) => {
     },
     {
       name: "laptop",
-      price: 400, 
+      price: 400,
     },
   ]);
 });
