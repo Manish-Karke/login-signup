@@ -1,69 +1,73 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
-import { handleError, handleSucess } from "../../utils/handling";
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 
-const page = () => {
+import { handleError, handleSucess } from "../../utils/handling";
+
+export default function HomePage() {
   const router = useRouter();
-  const [logginedInUser, setLogginedIn] = useState("");
-  const [product, setProduct] = useState([]);
+  const [loggedInUser, setLoggedInUser] = useState("");
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    setLogginedIn(localStorage.getItem("loggedInUser"));
+    setLoggedInUser(localStorage.getItem("loggedInUser"));
   }, []);
 
-  const handleLogout = (e) => {
+  const handleLogout = () => {
     try {
       localStorage.removeItem("token");
       localStorage.removeItem("loggedInUser");
-      handleSucess("User is logout");
+      handleSucess("User is logged out");
       setTimeout(() => {
         router.push("/components/login");
       }, 1000);
     } catch (error) {
-      handleError(error);
+      handleError(error.message || error);
     }
   };
 
-  const fetchproduct = async () => {
+  const fetchProducts = async () => {
     try {
       const url = "https://login-signup-sigma-wine.vercel.app/product";
-      const headers = {
+      const token = localStorage.getItem("token");
+      const response = await fetch(url, {
         headers: {
-          Authorization: localStorage.getItem("token"),
+          Authorization: token,
         },
-      };
-      const response = await fetch(url, headers);
+      });
       const result = await response.json();
-      console.log(result);
-      setProduct(result||[]);
+      setProducts(result || []);
     } catch (error) {
-      handleError(error);
+      handleError(error.message || error);
     }
   };
+
   useEffect(() => {
-    fetchproduct();
+    fetchProducts();
   }, []);
 
   return (
     <div>
-      <p>welcom Mr. {logginedInUser}</p>
+      <p>Welcome Mr. {loggedInUser}</p>
       <button onClick={handleLogout}>Logout</button>
+
       <div>
-        {
-        Array.isArray(product) &&
-          product?.map((item, index) => (
+        {Array.isArray(products) && products.length > 0 ? (
+          products.map((item, index) => (
             <ul key={index}>
               <span>
                 {item.name} : {item.price}
               </span>
             </ul>
-          ))}
+          ))
+        ) : (
+          <p>No products found.</p>
+        )}
       </div>
+
       <ToastContainer />
     </div>
   );
-};
-
-export default page;
+}

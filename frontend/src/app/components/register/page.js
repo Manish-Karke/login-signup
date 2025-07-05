@@ -1,72 +1,74 @@
 "use client";
+
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ToastContainer } from "react-toastify";
 
 import { handleError, handleSucess } from "../../utils/handling";
-import { ToastContainer } from "react-toastify";
-import { useRouter } from "next/navigation";
 
-const signUp= () => {
+export default function SignUpPage() {
   const router = useRouter();
-  const [singnup, setSingnup] = useState({
+  const [signup, setSignup] = useState({
     name: "",
     email: "",
     password: "",
   });
-  const handlechange = (e) => {
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
-    const copySignupInfo = { ...singnup };
-    copySignupInfo[name] = value;
-    setSingnup(copySignupInfo);
+    setSignup((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlesignup = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    const { name, email, password } = singnup;
+    const { name, email, password } = signup;
+
     if (!name || !email || !password) {
-      return handleError("name email and password are required");
+      return handleError("Name, email, and password are required");
     }
+
     try {
       const url = "https://login-signup-sigma-wine.vercel.app/auth/signup";
       const response = await fetch(url, {
         method: "POST",
         headers: {
-          "content-Type": "application/json",
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(singnup),
+        body: JSON.stringify(signup),
       });
       const result = await response.json();
 
       const { message, success, error } = result;
+
       if (success) {
         handleSucess(message);
         setTimeout(() => {
           router.push("/components/login");
         }, 1000);
       } else if (error) {
-        const detail = error?.details[0]?.message;
-        handleError(detail);
-      } else if (!success) {
+        const detail = error?.details?.[0]?.message;
+        handleError(detail || "An error occurred");
+      } else {
         handleError(message);
       }
-      console.log(result);
     } catch (error) {
-      handleError(error);
+      handleError(error.message || "Network error");
     }
   };
+
   return (
     <div className="container">
-      <h1>signUp</h1>
-      <form onSubmit={handlesignup}>
+      <h1>Sign Up</h1>
+      <form onSubmit={handleSignup}>
         <div>
           <label htmlFor="name">
             <input
-              onChange={handlechange}
+              onChange={handleChange}
               type="text"
               name="name"
               autoFocus
-              placeholder="Enter ur name"
-              value={singnup.name}
+              placeholder="Enter your name"
+              value={signup.name}
             />
           </label>
         </div>
@@ -74,35 +76,32 @@ const signUp= () => {
         <div>
           <label htmlFor="email">
             <input
-              onChange={handlechange}
+              onChange={handleChange}
               type="email"
               name="email"
-              placeholder="Enter ur email"
-              value={singnup.email}
+              placeholder="Enter your email"
+              value={signup.email}
             />
           </label>
         </div>
         <div>
           <label htmlFor="password">
             <input
-              onChange={handlechange}
+              onChange={handleChange}
               type="password"
               name="password"
-              placeholder="Enter ur password"
-              value={singnup.password}
+              placeholder="Enter your password"
+              value={signup.password}
             />
           </label>
         </div>
 
-        <button>signup</button>
+        <button type="submit">Sign Up</button>
         <span>
-          already have an account
-          <a href="/components/login">Login</a>
+          Already have an account? <a href="/components/login">Login</a>
         </span>
       </form>
       <ToastContainer />
     </div>
   );
-};
-
-export default signUp;
+}
