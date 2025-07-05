@@ -18,6 +18,10 @@ app.use(cors());
 app.use("/auth", router);
 app.use("/product", porrouter);
 
+app.get('/ping', (req, res) => {
+    res.send('PONG');
+});
+
 app.listen(PORT, URL, (error) => {
   if (!error) {
     console.log(`http://${URL}:${PORT}`);
