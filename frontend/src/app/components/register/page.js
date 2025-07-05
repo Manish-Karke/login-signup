@@ -28,7 +28,7 @@ export default function SignUpPage() {
     }
 
     try {
-      const url = "https://login-signup-sigma-wine.vercel.app/auth/signup";
+      const url = "https://login-signup-steel-ten.vercel.app/auth/signup";
       const response = await fetch(url, {
         method: "POST",
         headers: {
