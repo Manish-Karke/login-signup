@@ -1,42 +1,44 @@
 "use client";
+
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ToastContainer } from "react-toastify";
 
 import { handleError, handleSucess } from "../../utils/handling";
-import { ToastContainer } from "react-toastify";
-import { useRouter } from "next/navigation";
 
-const login = () => {
+export default function LoginPage() {
   const router = useRouter();
   const [login, setLogin] = useState({
     email: "",
     password: "",
   });
-  const handlechange = (e) => {
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
-    const copyloginInfo = { ...login };
-    copyloginInfo[name] = value;
-    setLogin(copyloginInfo);
+    setLogin((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     const { email, password } = login;
+
     if (!email || !password) {
       return handleError("email and password are required");
     }
+
     try {
       const url = "https://login-signup-sigma-wine.vercel.app/auth/login";
       const response = await fetch(url, {
         method: "POST",
         headers: {
-          "content-Type": "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(login),
       });
       const result = await response.json();
 
       const { message, success, jwtToken, name, error } = result;
+
       if (success) {
         handleSucess(message);
         localStorage.setItem("token", jwtToken);
@@ -45,27 +47,27 @@ const login = () => {
           router.push("/components/home");
         }, 1000);
       } else if (error) {
-        const detail = error?.details[0]?.message;
-        handleError(detail);
-      } else if (!success) {
+        const detail = error?.details?.[0]?.message;
+        handleError(detail || "An error occurred");
+      } else {
         handleError(message);
       }
-      console.log(result);
     } catch (error) {
-      handleError(error);
+      handleError(error.message || "Network error");
     }
   };
+
   return (
     <div className="container">
-      <h1>login</h1>
+      <h1>Login</h1>
       <form onSubmit={handleLogin}>
         <div>
           <label htmlFor="email">
             <input
-              onChange={handlechange}
+              onChange={handleChange}
               type="email"
               name="email"
-              placeholder="Enter ur email"
+              placeholder="Enter your email"
               value={login.email}
             />
           </label>
@@ -73,24 +75,22 @@ const login = () => {
         <div>
           <label htmlFor="password">
             <input
-              onChange={handlechange}
+              onChange={handleChange}
               type="password"
               name="password"
-              placeholder="Enter ur password"
+              placeholder="Enter your password"
               value={login.password}
             />
           </label>
         </div>
 
-        <button>Login</button>
+        <button type="submit">Login</button>
         <span>
-          Don't have an account?
+          Don&apos;t have an account?{" "}
           <a href="/components/register">Register</a>
         </span>
       </form>
       <ToastContainer />
     </div>
   );
-};
-
-export default login;
+}
