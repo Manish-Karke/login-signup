@@ -30,7 +30,7 @@ export default function HomePage() {
 
   const fetchProducts = async () => {
     try {
-      const url = "https://login-signup-sigma-wine.vercel.app/product";
+      const url = "https://login-signup-steel-ten.vercel.app/product";
       const token = localStorage.getItem("token");
       const response = await fetch(url, {
         headers: {
